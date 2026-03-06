@@ -37,7 +37,16 @@ def cdf_probabilities():
         simulated_gt5
     """
 
-    raise NotImplementedError
+    analytic_gt5 = math.exp(-5)
+    analytic_lt5 = 1 - math.exp(-5)
+    analytic_interval = math.exp(-3) - math.exp(-7)
+
+    np.random.seed(42)
+    samples = np.random.exponential(scale=1.0, size=100000)
+
+    simulated_gt5 = np.mean(samples > 5)
+
+    return analytic_gt5, analytic_lt5, analytic_interval, simulated_gt5
 
 
 # =========================================================
@@ -70,7 +79,25 @@ def pdf_validation_plot():
         is_valid_pdf
     """
 
-    raise NotImplementedError
+    def pdf(x):
+        return 2 * x * np.exp(-x**2)
+
+    integral_value, _ = quad(pdf, 0, np.inf)
+
+    is_valid_pdf = (integral_value - 1) < 1e-6
+
+    x = np.linspace(0, 3, 1000)
+    y = pdf(x)
+
+    plt.figure(figsize=(8, 5))
+    plt.plot(x, y, 'b-', linewidth=2)
+    plt.xlabel('x')
+    plt.ylabel('f(x)')
+    plt.title('PDF: f(x) = 2x e^{-x²}')
+    plt.grid(True, alpha=0.3)
+    plt.show()
+
+    return integral_value, is_valid_pdf
 
 
 # =========================================================
@@ -101,7 +128,16 @@ def exponential_probabilities():
         simulated_interval
     """
 
-    raise NotImplementedError
+    analytic_gt5 = math.exp(-5)
+    analytic_interval = math.exp(-1) - math.exp(-3)
+
+    np.random.seed(42)
+    samples = np.random.exponential(scale=1.0, size=100000)
+
+    simulated_gt5 = np.mean(samples > 5)
+    simulated_interval = np.mean((samples > 1) & (samples < 3))
+
+    return analytic_gt5, analytic_interval, simulated_gt5, simulated_interval
 
 
 # =========================================================
@@ -137,4 +173,20 @@ def gaussian_probabilities():
         simulated_interval
     """
 
-    raise NotImplementedError
+    mu = 10
+    sigma = 2
+
+    z1 = (12 - mu) / sigma
+    analytic_le12 = norm.cdf(z1)
+
+    z_lower = (8 - mu) / sigma
+    z_upper = (12 - mu) / sigma
+    analytic_interval = norm.cdf(z_upper) - norm.cdf(z_lower)
+
+    np.random.seed(42)
+    samples = np.random.normal(loc=mu, scale=sigma, size=100000)
+
+    simulated_le12 = np.mean(samples <= 12)
+    simulated_interval = np.mean((samples > 8) & (samples < 12))
+
+    return analytic_le12, analytic_interval, simulated_le12, simulated_interval
